@@ -145,7 +145,7 @@ select_hostname() { #TODO return multiples
   filters+="$(group_filter ${nordvpn_api})"
   filters+="$(technology_filter)"
 
-  hostname=$(curl -s "${nordvpn_api}/v1/servers/recommendations?${filters}limit=1" | jq --raw-output ".[].hostname")
+  hostname=$(curl -s "${nordvpn_api}/v1/servers/recommendations?${filters}limit=10" | jq --raw-output --slurp '.[] | sort_by(.load) | limit(1;.[]) | [.hostname] | "\(.[0])"')
   if [[ -z ${hostname} ]]; then
     log "Warning, unable to find a server with the specified parameters, please review your parameters, NORDVPN_COUNTRY=${NORDVPN_COUNTRY}, NORDVPN_CATEGORY=${NORDVPN_CATEGORY}, NORDVPN_PROTOCOL=${NORDVPN_PROTOCOL}"
     #hostname=$(curl -s "${nordvpn_api}/v1/servers/recommendations?limit=1" | jq --raw-output ".[].hostname")
